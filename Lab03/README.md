@@ -4,6 +4,9 @@
 
 **Dataset:** [Kaggle Hotel Booking Demand](https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand)
 
+# Student ID- 202618009
+# Name- Lakshay Modi
+
 ### Overview
 
 This project uses the Hotel Booking Demand dataset to predict whether a hotel reservation will be cancelled (`is_canceled`). The focus is on comparing preprocessing choices and seeing how they affect two classification models.
