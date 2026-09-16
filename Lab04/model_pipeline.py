@@ -273,6 +273,40 @@ def predict_price(input_data):
     return float(preds[0]) if single else preds
 
 
+def get_model_insights():
+    """
+    Pull a few human-readable facts straight out of the fitted pipeline,
+    so the Streamlit app never has to hardcode values that only the
+    trained model actually knows:
+
+      - the exact list of neighbourhoods seen during training (used to
+        populate a dropdown instead of a free-text field, so a typo
+        can't silently fall back to "unknown category")
+      - the high/low price keyword sets learned by NameKeywordFeaturizer
+      - the (lat, lon) of the learned city-wide "high price centre"
+
+    If the app is ever pointed at a retrained pipeline, these values
+    update automatically — nothing here needs to change by hand.
+    """
+    pipeline = _load_pipeline()
+    pre = pipeline.named_steps["preprocessing"]
+    keyword_step = pre.named_steps["keyword_features"]
+    feature_step = pre.named_steps["feature_engineering"]
+    column_transformer = pre.named_steps["preprocessing"]
+
+    neighbourhoods = []
+    for name, transformer, _cols in column_transformer.transformers_:
+        if name == "neighbourhood":
+            neighbourhoods = sorted(transformer.named_steps["onehot"].categories_[0])
+
+    return {
+        "neighbourhoods": neighbourhoods,
+        "high_price_keywords": sorted(keyword_step.high_price_keywords_),
+        "low_price_keywords": sorted(keyword_step.low_price_keywords_),
+        "high_price_centre": tuple(feature_step.high_price_centre_),
+    }
+
+
 if __name__ == "__main__":
     # Quick smoke test — run `python model_pipeline.py` after the
     # joblib file exists to sanity-check a single prediction.
